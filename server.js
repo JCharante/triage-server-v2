@@ -75,7 +75,21 @@ app.post('/', async function(req, res) {
         // make sure session key is valid and get associated user
         const user = await mongo.getUserFromSessionKey(req.body.sessionKey);
         console.log('Got user', user);
-        res.status(200).end(JSON.stringify(user));
+        if (!('requestType' in req.body)) {
+            res.status(400).end();
+        }
+        switch (req.body.requestType) {
+            case 'userDetails': {
+                res.status(200).end(JSON.stringify({
+                    displayName: user.displayName
+                }))
+                break;
+            }
+            default: {
+                res.status(200).end(JSON.stringify(user));
+                break;
+            }
+        }
     } catch (error) {
         res.status(500).end(JSON.stringify({
             error: error.toString()
