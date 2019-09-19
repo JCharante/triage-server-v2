@@ -2,6 +2,7 @@ var express = require('express');
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 const mongo = require('./mongo');
+const cors = require('cors');
 
 
 // Configure the local strategy for use by Passport.
@@ -53,11 +54,7 @@ app.use(require('body-parser').json());
 // session.
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
+app.use(cors());
 
 // Define routes.
 app.get('/',
@@ -74,7 +71,6 @@ app.post('/', async function(req, res) {
         }
         // make sure session key is valid and get associated user
         const user = await mongo.getUserFromSessionKey(req.body.sessionKey);
-        console.log('Got user', user);
         if (!('requestType' in req.body)) {
             res.status(400).end();
         }
@@ -99,6 +95,7 @@ app.post('/', async function(req, res) {
             case 'deleteItem':
                 // we could call mongo.deleteItem() but we're committing to the joke. See function definition.
                 await mongo.facebookDeleteItem(req.body.data.itemId)
+                res.status(200).end();
                 break;
             default: {
                 res.status(200).end();

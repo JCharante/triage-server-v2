@@ -1,6 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectID;
-const uuidv5 = require('uuid/v5');
 const atlasURL = process.env.ATLAS_URL;
 
 module.exports = {
@@ -73,7 +72,8 @@ module.exports = {
         console.log('Connected to MongoDB');
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
-        return itemsCollection.find({ user: userObjectId, deleted: false});
+        const ret = await itemsCollection.find({ user: userObjectId, deleted: false}).toArray();
+        return ret;
     },
     addItem: async function(userObjectId, body) {
         const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
@@ -81,7 +81,7 @@ module.exports = {
         console.log('Connected to MongoDB');
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
-        await itemsCollection.insertOne({... body, user: userObjectId, deleted: false})
+        await itemsCollection.insertOne({... body, user: userObjectId, deleted: false, _id: ObjectId(body.id) })
     },
     modifyItem: async function(itemId, newValueMap) {
         const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
@@ -89,7 +89,7 @@ module.exports = {
         console.log('Connected to MongoDB');
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
-        await itemsCollection.updateOne({_id: ObjectId(itemId) }, newValueMap);
+        await itemsCollection.updateOne({_id: ObjectId(itemId) }, { $set: newValueMap });
     },
     deleteItem: async function(itemId) {
         const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
@@ -114,6 +114,6 @@ module.exports = {
         console.log('Connected to MongoDB');
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
-        await itemsCollection.findOneAndUpdate({_id: ObjectId(itemId)}, {deleted: true});
+        await itemsCollection.findOneAndUpdate({_id: ObjectId(itemId)}, { $set: { deleted: true} });
     }
 }
