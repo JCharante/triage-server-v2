@@ -15,11 +15,11 @@ passport.use(new Strategy(
     async function(username, password, cb) {
         try {
             var userDoc = await mongo.verifyPassword(username, password);
+            const sessionDoc = await mongo.createSession(userDoc._id)
+            cb(null, sessionDoc);
         } catch (error) {
             cb(null, false, { message: error.toString() })
         }
-        const sessionDoc = await mongo.createSession(userDoc._id)
-        cb(null, sessionDoc);
     }));
 
 
