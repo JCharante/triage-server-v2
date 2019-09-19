@@ -1,13 +1,16 @@
 {
-  "name": "express-4.x-local-example",
-  "version": "0.0.0",
-  "description": "Express 4.x app using Passport for authentication with username and password.",
+  "name": "triage-server-v2",
+  "version": "0.0.1",
+  "description": "Triage V2. See github.com/JCharante/triage-server-v2.",
   "keywords": [
     "example",
     "express",
     "passport"
   ],
-  "author": "Jared Hanson",
+  "author": "Jyan Zarate",
+  "scripts": {
+    "start": "node server.js"
+  },
   "license": "Unlicense",
   "homepage": "https://github.com/passport/express-4.x-local-example",
   "repository": {
