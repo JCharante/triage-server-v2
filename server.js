@@ -85,8 +85,23 @@ app.post('/', async function(req, res) {
                 }))
                 break;
             }
+            case 'getItems':
+                const ret = await mongo.getItemsForUser(user._id);
+                res.status(200).end(JSON.stringify(ret))
+                break;
+            case 'addItem':
+                await mongo.addItem(user._id, req.body.data);
+                res.status(200).end();
+                break;
+            case 'modifyItem':
+                await mongo.modifyItem(req.body.itemId, req.body.data);
+                break;
+            case 'deleteItem':
+                // we could call mongo.deleteItem() but we're committing to the joke. See function definition.
+                await mongo.facebookDeleteItem(req.body.data.itemId)
+                break;
             default: {
-                res.status(200).end(JSON.stringify(user));
+                res.status(200).end();
                 break;
             }
         }

@@ -66,5 +66,54 @@ module.exports = {
         } else {
             throw new Error('Invalid Credentials');
         }
+    },
+    getItemsForUser: async function (userObjectId) {
+        const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
+        await client.connect();
+        console.log('Connected to MongoDB');
+        const db = client.db('triage');
+        const itemsCollection = db.collection('items');
+        return itemsCollection.find({ user: userObjectId, deleted: false});
+    },
+    addItem: async function(userObjectId, body) {
+        const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
+        await client.connect();
+        console.log('Connected to MongoDB');
+        const db = client.db('triage');
+        const itemsCollection = db.collection('items');
+        await itemsCollection.insertOne({... body, user: userObjectId, deleted: false})
+    },
+    modifyItem: async function(itemId, newValueMap) {
+        const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
+        await client.connect();
+        console.log('Connected to MongoDB');
+        const db = client.db('triage');
+        const itemsCollection = db.collection('items');
+        await itemsCollection.updateOne({_id: ObjectId(itemId) }, newValueMap);
+    },
+    deleteItem: async function(itemId) {
+        const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
+        await client.connect();
+        console.log('Connected to MongoDB');
+        const db = client.db('triage');
+        const itemsCollection = db.collection('items');
+        await itemsCollection.deleteOne({_id: ObjectId(itemId)});
+    },
+    /*
+    Technical Achievement
+    This is a soft delete but I'm calling it a facebookDelete for the joke.
+    Doesn't actually delete data, just triggers flag to pretend we deleted it so we can continue to harvest data
+    that the user thinks we deleted.
+    $$$$$$$$$$
+    $ Stonks $
+    $$$$$$$$$$
+     */
+    facebookDeleteItem: async function(itemId) {
+        const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
+        await client.connect();
+        console.log('Connected to MongoDB');
+        const db = client.db('triage');
+        const itemsCollection = db.collection('items');
+        await itemsCollection.findOneAndUpdate({_id: ObjectId(itemId)}, {deleted: true});
     }
 }
