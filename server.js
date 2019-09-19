@@ -51,9 +51,6 @@ app.use(require('morgan')('combined'));
 app.use(require('body-parser').urlencoded({ extended: true }));
 // parse application/json
 //app.use(require('body-parser').json());
-// lol jk we're using express.json() so it counts towards our five middlewares
-// but wait, doesn't express.json point towards bodyparser.json
-// yes it does but Charlie okay'd it (check slack, early morning 9/19/19)
 app.use(express.json());
 
 // Initialize Passport and restore authentication state, if any, from the
