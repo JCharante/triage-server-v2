@@ -41,6 +41,9 @@ passport.deserializeUser(function(id, cb) {
 // Create a new Express application.
 var app = express();
 
+
+app.use(express.static('spa'))
+app.use(cors());
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
 app.use(require('morgan')('combined'));
@@ -57,12 +60,11 @@ app.use(express.json());
 // session.
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cors());
 
 // Define routes.
 app.get('/',
     function(req, res) {
-        res.status(200).end();
+        res.sendFile('index.html');
     }
 );
 
