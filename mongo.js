@@ -20,6 +20,7 @@ module.exports = {
         if (!userDocument) {
             throw new Error('User Does Not Exist');
         }
+        await client.close();
         return userDocument;
     },
     createUser: async function(username, password, displayName) {
@@ -39,6 +40,7 @@ module.exports = {
             displayName
         })
         const userDocument = await usersCollection.findOne({ username, password, displayName });
+        await client.close();
         return userDocument;
     },
     createSession: async function(userId) {
@@ -48,6 +50,7 @@ module.exports = {
         const db = client.db('triage');
         const sessionsCollection = db.collection('sessions');
         const ret = await sessionsCollection.insertOne({ user: userId })
+        await client.close();
         return { sessionKey: ret.insertedId.toString(), userId: userId.toString() };
     },
     verifyPassword: async function(username, password) {
@@ -57,6 +60,7 @@ module.exports = {
         const db = client.db('triage');
         const usersCollection = db.collection('users');
         const userDocument = await usersCollection.findOne({username});
+        await client.close();
         if (!userDocument) {
             throw new Error('Invalid Credentials');
         }
@@ -73,6 +77,7 @@ module.exports = {
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
         const ret = await itemsCollection.find({ user: userObjectId, deleted: false}).toArray();
+        await client.close();
         return ret;
     },
     addItem: async function(userObjectId, body) {
@@ -82,6 +87,7 @@ module.exports = {
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
         await itemsCollection.insertOne({... body, user: userObjectId, deleted: false, _id: ObjectId(body.id) })
+        await client.close();
     },
     modifyItem: async function(itemId, newValueMap) {
         const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
@@ -90,6 +96,7 @@ module.exports = {
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
         await itemsCollection.updateOne({_id: ObjectId(itemId) }, { $set: newValueMap });
+        await client.close();
     },
     deleteItem: async function(itemId) {
         const client = await new MongoClient(atlasURL, {useNewUrlParser: true});
@@ -98,6 +105,7 @@ module.exports = {
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
         await itemsCollection.deleteOne({_id: ObjectId(itemId)});
+        await client.close();
     },
     /*
     Technical Achievement
@@ -115,5 +123,6 @@ module.exports = {
         const db = client.db('triage');
         const itemsCollection = db.collection('items');
         await itemsCollection.findOneAndUpdate({_id: ObjectId(itemId)}, { $set: { deleted: true} });
+        await client.close();
     }
 }
