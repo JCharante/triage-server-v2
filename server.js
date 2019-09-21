@@ -93,6 +93,7 @@ app.post('/', async function(req, res) {
                 break;
             case 'modifyItem':
                 await mongo.modifyItem(req.body.itemId, req.body.data);
+                res.status(200).end();
                 break;
             case 'deleteItem':
                 // we could call mongo.deleteItem() but we're committing to the joke. See function definition.
